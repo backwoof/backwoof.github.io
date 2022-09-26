@@ -1,0 +1,818 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://img1.baidu.com/it/u=263748125,2146765799&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=320&amp;h=318">
+  <link rel="icon" href="https://img1.baidu.com/it/u=263748125,2146765799&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=320&amp;h=318">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Su">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言机器人抓取过程中的四个关键任务：目标定位、姿态估计、抓取检测和运动规划。具体来说，目标定位包括目标检测和分割方法，姿态估计包括基于RGB和RGBD的方法，抓取检测包括传统方法和基于深度学习的方法，运动规划包括分析方法、模拟学习方法和强化学习方法。此外，许多方法共同完成了一些任务，如目标检测结合6D位姿估计、无位姿估计的抓取检测、端到端抓取检测、端到端运动规划等。此外，还对相关数据集进行了总结，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器人检测抓取">
+<meta property="og:url" content="https://backwoof.github.io/2022/09/26/robot-grab/index.html">
+<meta property="og:site_name" content="Su&#39; space">
+<meta property="og:description" content="引言机器人抓取过程中的四个关键任务：目标定位、姿态估计、抓取检测和运动规划。具体来说，目标定位包括目标检测和分割方法，姿态估计包括基于RGB和RGBD的方法，抓取检测包括传统方法和基于深度学习的方法，运动规划包括分析方法、模拟学习方法和强化学习方法。此外，许多方法共同完成了一些任务，如目标检测结合6D位姿估计、无位姿估计的抓取检测、端到端抓取检测、端到端运动规划等。此外，还对相关数据集进行了总结，">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://backwoof.github.io/2022/09/26/robot-grab/robot_grab_1.png">
+<meta property="article:published_time" content="2022-09-26T08:57:44.000Z">
+<meta property="article:modified_time" content="2022-09-26T09:22:23.245Z">
+<meta property="article:author" content="Su">
+<meta property="article:tag" content="机器人">
+<meta property="article:tag" content="目标检测">
+<meta property="article:tag" content="抓取点检测">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://backwoof.github.io/2022/09/26/robot-grab/robot_grab_1.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>机器人检测抓取 - Su&#39; space</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/bynotes/texiao/source/css/daziyanse.css# 头部打字机颜色.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/bynotes/texiao/source/css/gundongtiao.css# 滚动条颜色.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/bynotes/texiao/source/css/toubudaziji.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"backwoof.github.io","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":80,"cursorChar":"|","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Su&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                主页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" target="_blank" rel="noopener" href="https://github.com/backwoof">
+                <i class="iconfont icon-github-fill"></i>
+                github
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/playlist/">
+                <i class="iconfont icon-music"></i>
+                音乐
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" target="_blank" rel="noopener" href="https://www.o8tv.com/">
+                <i class="iconfont icon-douban-fill"></i>
+                电影
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-slack-fill"></i>
+                资源
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/study/">
+                    <i class="iconfont icon-codepen-fill"></i>
+                    study
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/job/">
+                    <i class="iconfont icon-codepen-fill"></i>
+                    job
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tool/">
+                    <i class="iconfont icon-codepen-fill"></i>
+                    tool
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/book/">
+                    <i class="iconfont icon-codepen-fill"></i>
+                    book
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于我
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://images3.alphacoders.com/949/949504.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="机器人检测抓取"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-26 16:57" pubdate>
+          September 26, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 mins
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> views
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">机器人检测抓取</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>机器人抓取过程中的四个关键任务：<strong>目标定位</strong>、<strong>姿态估计</strong>、<strong>抓取检测</strong>和<strong>运动规划</strong>。具体来说，目标定位包括目标检测和分割方法，姿态估计包括基于RGB和RGBD的方法，抓取检测包括传统方法和基于深度学习的方法，运动规划包括分析方法、模拟学习方法和强化学习方法。此外，许多方法共同完成了一些任务，如目标检测结合6D位姿估计、无位姿估计的抓取检测、端到端抓取检测、端到端运动规划等。此外，还对相关数据集进行了总结，并对每项任务的最新方法进行了比较。提出了机器人抓取面临的挑战，并指出了今后解决这些挑战的方向。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>为了完成机器人的抓取任务，机器人首先需要感知物体。随着传感器设备的不断发展，目前的机器人都配备了RGB摄像机和深度摄像机来获取丰富的环境信息。然而，原始的RGB-D图像对于机器人来说是简单的数字网格，在那里需要提取高层次的语义信息来实现基于视觉的感知。要抓取的目标对象的高层信息通常包含位置、方向和抓取位置。然后计算抓取规划以执行物理抓取。赋予机器人感知能力一直是计算机视觉和机器人学科的一个长期目标。机器人抓取不仅意义重大，而且早已被研究。机器人抓取系统由抓取检测系统、抓取规划系统和控制系统组成。其中，抓取检测系统是关键的入口点，它分为三个任务：目标定位、姿态估计和抓取点检测。结合抓取规划，详细介绍四项任务。</p>
+<p><img src="/2022/09/26/robot-grab/robot_grab_1.png" srcset="/img/loading.gif" lazyload alt="关键任务"></p>
+<p>早期的方法假设要抓取的对象被放置在一个背景简单的干净环境中，从而简化了对象定位任务，而在相对复杂的环境中，它们的能力相当有限。一些目标检测方法利用机器学习方法对基于手工二维描述符的分类器进行训练。但是，由于手工创建的描述符的限制，这些分类器的性能有限。近年来，深度学习已经开始主导图像相关的任务，如目标检测和分割。此外，从RGB图像到深度图像的训练数据，以及二维或三维输入的深度学习网络，极大地提高了目标定位的性能，促进了机器人抓取技术的发展。利用目标物的位置，可以进行抓取检测。早期的分析方法是直接分析输入数据的几何结构，根据力闭合或形状闭合来寻找合适的抓取点。然而，分析方法存在着费时、计算困难等问题。随后，随着大量三维模型的出现，可以分析数据驱动的方法，将三维模型数据库中的抓取转移到目标对象。Bohg等人介绍了数据驱动的抓取方法，并根据抓取配置是针对已知、熟悉还是未知对象计算的，将这些方法分为三组。一般来说，目标物体的6D姿态是完成这项任务的关键。基于RGB图像的方法和基于深度图像的方法都可以实现精确的姿态估计。然而，这些方法如部分配准方法易受传感器噪声或不完整数据的影响。通过深度学习方法，可以直接或间接地从输入数据中估计姿态，从而获得对传感器噪声或不完整数据的抵抗力。还存在基于深度学习的方法，不需要6D姿势来进行抓取检测。抓取结构可以通过深卷积网络直接或间接回归。Caldera等人回顾了基于深度学习的机器人抓取检测方法。他们讨论了深度学习方法的每个元素如何提高机器人抓取检测的整体性能。此外，监督学习法、强化学习法也被用来直接完成特定的任务，如玩具装配等与抓取密切相关。</p>
+<h1 id="四项基本任务"><a href="#四项基本任务" class="headerlink" title="四项基本任务"></a>四项基本任务</h1><p>下面将从目标定位、姿态估计、抓取点检测以及抓取规划四个方面详细介绍机器人抓取系统的主要内容。</p>
+<h2 id="目标定位（Object-localization）"><a href="#目标定位（Object-localization）" class="headerlink" title="目标定位（Object localization）"></a>目标定位（Object localization）</h2><p>大多数抓取方法首先需要计算目标在输入图像数据中的位置。这涉及到目标检测和分割技术。目标检测提供目标对象的矩形包围盒，目标分割提供目标对象的精确边界。后者提供了更精确的对象区域描述，而其计算则更耗时。<br><strong>针对2D目标检测</strong>：主要包括SIFT、SURF、Faster RCNN、YOLO、SSD等常见目标检测算法。<br><strong>针对3D目标检测</strong>：主要包括FPFH、SHOT等传统算法以及PointRCNN、VoxelNet等深度学习方式。<br><strong>针对2D目标分割</strong>：主要包括FCN、UNet、DeepLab、Mask RCNN等方式。<br><strong>针对3D目标分割</strong>：主要包括PointNet、PointNet++、PointCNN等方式。</p>
+<p>2D检测：</p>
+<p>3D检测：</p>
+<p>2D分割：</p>
+<p>3D分割：</p>
+<p>与传统的手工描述子方法相比，基于深度学习的方法取得了较好的效果。然而，对大量训练数据的需求和训练模型的泛化能力仍然具有挑战性。</p>
+<h2 id="6D姿态估计"><a href="#6D姿态估计" class="headerlink" title="6D姿态估计"></a>6D姿态估计</h2><p>6D姿态估计在增强现实、机器人操作、自主驾驶等领域发挥着重要作用。它帮助机器人知道要抓取的物体的位置和方向。姿态估计方法大致可分为四种，分别基于对应、模板、投票和回归。</p>
+<h3 id="不基于目标检测先验信息"><a href="#不基于目标检测先验信息" class="headerlink" title="不基于目标检测先验信息"></a><strong>不基于目标检测先验信息</strong></h3><p>基于对应方法：</p>
+<ol>
+<li>在2D点和3D点之间找到匹配，并使用PNP方法,如SIFT、SURF、ORB</li>
+<li>通过随机假设或三维描述寻找三维对应关系，并使用ICP对结果进行细化： FPFH、SHOT</li>
+</ol>
+<p>基于模板方法：LineMod算法。从没有纹理的三维模型渲染图像，提取梯度信息进行匹配，并使用ICP对结果进行细化。<br>基于投票方法：PPF算法。基于三维点云或具有姿态的渲染RGB-D图像，每个局部预测一个结果，并使用RANSAC对结果进行优化。</p>
+<h3 id="基于目标检测信息的6D姿态估计"><a href="#基于目标检测信息的6D姿态估计" class="headerlink" title="基于目标检测信息的6D姿态估计"></a><strong>基于目标检测信息的6D姿态估计</strong></h3><p>这种方法也称为基于回归的方法，它同时完成目标检测和6D姿态估计。基于回归的方法：BB8、SSD6D、PoseCNN、Deep6DPose。基于三维点云或具有适当姿势的渲染RGB-D图像，并使用CNN进行姿态回归。</p>
+<p>独立于目标检测的方法在通常发生遮挡的杂乱场景中显示出明显的局限性；基于目标检测的方法是缺乏足够的训练数据。</p>
+<h2 id="抓取点检测（Grasp-Detection）"><a href="#抓取点检测（Grasp-Detection）" class="headerlink" title="抓取点检测（Grasp Detection）"></a>抓取点检测（Grasp Detection）</h2><p>抓取检测被定义为能够识别任何给定图像中物体的抓取点或抓取姿势。抓取策略应确保对新物体的稳定性、任务兼容性和适应性，抓取质量可通过物体上接触点的位置和手的配置来测量。为了掌握一个新的对象，完成以下任务，有分析方法和经验方法。分析方法根据抓取稳定性或任务要求的运动学和动力学公式，选择手指位置和手部构型，经验方法根据具体任务和目标物体的几何结构，使用学习算法选择抓取。</p>
+<p>根据是否需要进行目标定位，需要确定目标的姿态，进一步将其分为三类： 具有已知定位和姿势的方法、具有已知定位和无姿态的方法、无定位和无姿态的方法。</p>
+<h3 id="具有已知定位和姿势"><a href="#具有已知定位和姿势" class="headerlink" title="具有已知定位和姿势"></a><strong>具有已知定位和姿势</strong></h3><p>针对已知目标的经验方法，利用姿态将已知目标的抓取点转换为局部数据。<br>主要算法有：</p>
+<ol>
+<li>Multi-view self-supervised deep learning for 6d pose estimation in the amazon picking challenge.</li>
+<li>Silhonet: An RGB method for 3d object pose estimation and grasp planning.</li>
+</ol>
+<h3 id="具有已知定位和无姿态的方法"><a href="#具有已知定位和无姿态的方法" class="headerlink" title="具有已知定位和无姿态的方法"></a><strong>具有已知定位和无姿态的方法</strong></h3><p>主要方法：</p>
+<ol>
+<li>Automatic grasp planning using shape primitives.</li>
+<li>Part-based grasp planning for familiar objects.</li>
+<li>Transferring grasp configurations using active learning and local replanning.</li>
+<li>Dex-net 2.0: Deep learning to plan robust grasps with synthetic point clouds and analytic grasp metrics.</li>
+</ol>
+<h3 id="无定位无姿态的方法"><a href="#无定位无姿态的方法" class="headerlink" title="无定位无姿态的方法"></a><strong>无定位无姿态的方法</strong></h3><p>主要基于深度学习方法，包括：</p>
+<ol>
+<li>Deep learning for detecting robotic grasps.</li>
+<li>Real-time grasp detection using convolutional neural networks.</li>
+<li>Object discovery and grasp detection with a shared convolutional neural network.</li>
+<li>Supersizing self-supervision: Learning to grasp from 50k tries and 700 robot hours.</li>
+<li>Real-time, highly accurate robotic grasp detection using fully convolutional neural networks with high-resolution images.</li>
+<li>Robotic pick-and-place of novel objects in clutter with multi-affordance grasping and cross-domain image matching.</li>
+</ol>
+<h2 id="运动规划"><a href="#运动规划" class="headerlink" title="运动规划"></a>运动规划</h2><h3 id="已有抓取点"><a href="#已有抓取点" class="headerlink" title="已有抓取点"></a><strong>已有抓取点</strong></h3><p>本节介绍开环方法，其中假设抓取点已通过上述步骤检测到。这些方法设计了从机器人手到目标物体抓取点的路径。这里运动表示是关键问题。虽然存在从机器人手到目标抓握点的无限数量的轨迹，但是由于机器人臂的限制，许多区域无法到达。因此，需要对轨迹进行规划。</p>
+<p>主要有三种方法，如传统的基于DMP的方法、模仿学习的方法和基于强化学习的方法。</p>
+<p>基于DMP的方法：主要包括DMP算法。形式化为稳定的非线性吸引子系统。</p>
+<p>基于模仿学习的方法：</p>
+<ul>
+<li>Generalization of human grasping for multi-fingered robot hands.</li>
+</ul>
+<p>基于强化学习的方式：</p>
+<ul>
+<li>Task-agnostic self-modeling machines.</li>
+</ul>
+<h3 id="无抓取点"><a href="#无抓取点" class="headerlink" title="无抓取点"></a><strong>无抓取点</strong></h3><p>主要通过强化学习直接完成对原始RGB-D图像的抓取任务。<br>主要有：</p>
+<ul>
+<li>Learning hand-eye coordination for robotic grasping with deep learning and large-scale data collection.</li>
+<li>Qt-opt: Scalable deep reinforcement learning for vision-based robotic manipulation.</li>
+<li>Robustness via retrying: Closed-loop robotic manipulation with selfsupervised learning.</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%9C%BA%E5%99%A8%E4%BA%BA/">#机器人</a>
+      
+        <a href="/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/">#目标检测</a>
+      
+        <a href="/tags/%E6%8A%93%E5%8F%96%E7%82%B9%E6%A3%80%E6%B5%8B/">#抓取点检测</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>机器人检测抓取</div>
+      <div>https://backwoof.github.io/2022/09/26/robot-grab/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Su</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>September 26, 2022</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/25/zookeeper/" title="zookeeper">
+                        <span class="hidden-mobile">zookeeper</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    
+      <script type="text/javascript">
+        var disqus_config = function() {
+          this.page.url = 'https://backwoof.github.io/2022/09/26/robot-grab/';
+          this.page.identifier = '/2022/09/26/robot-grab/';
+        };
+        Fluid.utils.loadComments('#disqus_thread', function() {
+          var d = document, s = d.createElement('script');
+          s.src = '//' + 'fluid' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', new Date());
+          (d.head || d.body).appendChild(s);
+        });
+      </script>
+    
+    <noscript>Please enable JavaScript to view the comments</noscript>
+  </div>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/bynotes/texiao/source/js/qipao.js"></script>
+<script src="//cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/metowolf/Metingjs@1.2/dist/Meting.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/bynotes/texiao/source/js/timeDate.js"></script>
+<script src="//cdn.jsdelivr.net/gh/bynotes/texiao/source/js/daxuehua.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
